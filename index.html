@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Management System</title>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js"></script>
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("CjamtUH0QUbF9fmgs");
+        })();
+    </script>
+
+    <!-- jsPDF for donor download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Application Script -->
+    <script type="module" src="app.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="page">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Login</h2>
+        <form id="loginForm" aria-label="Login Form">
+            <input type="email" id="loginEmail" placeholder="Email" required aria-label="Email">
+            <input type="password" id="loginPassword" placeholder="Password" required aria-label="Password">
+            <button type="submit" aria-label="Log In">Log In</button>
+        </form>
+        <p><a href="#" id="registerLink" aria-label="Go to Register Page">Register</a></p>
+        <p><a href="#" id="forgotPasswordLink" aria-label="Reset Password">Forgot Password?</a></p>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div id="passwordResetModal" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Password Reset</h2>
+        <form id="passwordResetForm" aria-label="Password Reset Form">
+            <input type="email" id="resetEmail" placeholder="Email" required aria-label="Email">
+            <button type="submit" aria-label="Send Reset Link">Send Reset Link</button>
+        </form>
+    </div>
+
+    <!-- Register Page -->
+    <div id="registerPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Register</h2>
+        <form id="registerForm" aria-label="Register Form">
+            <input type="text" id="registerName" placeholder="Name" required aria-label="Name">
+            <input type="tel" id="registerMobile" placeholder="Mobile Number" required aria-label="Mobile Number">
+            <input type="email" id="registerEmail" placeholder="Email" required aria-label="Email">
+            <input type="password" id="registerPassword" placeholder="Password" required aria-label="Password">
+            <button type="submit" aria-label="Register">Register</button>
+        </form>
+        <p><a href="#" id="loginLink" aria-label="Return to Login Page">Back to Login</a></p>
+    </div>
+
+    <!-- Home Page -->
+    <div id="homePage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Narsingdi zila blood donor club</h2>
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Narsingdi Zila Blood Donor Club Logo" class="page-logo">
+        <button id="profileBtn" aria-label="View Profile">Profile</button>
+        <button id="donorInfoBtn" aria-label="Add Donor Information">Donor Information</button>
+        <button id="viewDonorsBtn" aria-label="View Donor List">Donor List</button>
+        <button id="searchDonorBtn" aria-label="Search Donors">Search Donors</button>
+        <button id="aboutUsBtn" aria-label="About Us">About Us</button>
+        <button id="logoutBtn" aria-label="Log Out">Log Out</button>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profilePage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Profile</h2>
+        <div id="profileInfo">
+            <p id="profileName"></p>
+            <p id="profileEmail"></p>
+            <p id="profileMobile"></p>
+            <p id="profileAccess"></p>
+            <button id="bloodDonationRulesBtn" aria-label="View Blood Donation Rules">রক্তদানের নিয়মাবলী</button>
+            <button id="bloodDonationBenefitsBtn" aria-label="View Blood Donation Benefits">রক্তদানের সুবিধা</button>
+        </div>
+        <div id="bloodDonationRulesSection" style="display: none;">
+            <h3>রক্তদানের নিয়মাবলী</h3>
+            <ul>
+                <li><strong>বয়স:</strong> রক্তদাতার বয়স ১৮ থেকে ৬০ বছরের মধ্যে হতে হবে।</li>
+                <li><strong>ওজন:</strong> ন্যূনতম ৫০ কেজি হতে হবে।</li>
+                <li><strong>স্বাস্থ্য:</strong> কোনো গুরুতর রোগ (যেমন, হৃদরোগ, ক্যান্সার, হেপাটাইটিস, এইডস) থাকা যাবে না। রক্তদানের সময় জ্বর, সর্দি বা সংক্রমণ থাকলে রক্ত দেওয়া যাবে না।</li>
+                <li><strong>হিমোগ্লোবিন:</strong> পুরুষদের জন্য ন্যূনতম ১২.৫ গ্রাম/ডিএল, মহিলাদের জন্য ১২ গ্রাম/ডিএল।</li>
+                <li><strong>রক্তদানের ব্যবধান:</strong> পুরুষরা প্রতি ৩ মাসে এবং মহিলারা প্রতি ৪ মাসে রক্ত দিতে পারেন।</li>
+                <li><strong>জীবনযাত্রা:</strong> মাদক গ্রহণ বা ঝুঁকিপূর্ণ আচরণ (যেমন, অসুরক্ষিত যৌন সম্পর্ক) থাকলে রক্তদান করা যাবে না।</li>
+                <li><strong>ঔষধ ও টিকা:</strong> অ্যান্টিবায়োটিক বা কিছু টিকা নেওয়ার পর ২-৪ সপ্তাহ অপেক্ষা করতে হবে।</li>
+                <li><strong>গর্ভাবস্থা:</strong> গর্ভবতী মহিলারা বা প্রসবের পর ৬ মাস পর্যন্ত রক্ত দিতে পারবেন না।</li>
+                <li><strong>রক্তদানের আগে:</strong> পুষ্টিকর খাবার খান, পর্যাপ্ত পানি পান করুন, এবং ৬-৮ ঘণ্টা ঘুম নিন।</li>
+                <li><strong>রক্তদানের পর:</strong> ১৫-২০ মিনিট বিশ্রাম নিন, প্রচুর পানি পান করুন, এবং ভারী কাজ এড়িয়ে চলুন।</li>
+            </ul>
+            <button id="backToProfileBtn" aria-label="Back to Profile">প্রোফাইলে ফিরুন</button>
+        </div>
+        <div id="bloodDonationBenefitsSection" style="display: none;">
+            <h3>রক্তদানের সুবিধা</h3>
+            <ul>
+                <li><strong>স্বাস্থ্য পরীক্ষা:</strong> রক্তদানের আগে বিনামূল্যে হিমোগ্লোবিন, রক্তচাপ, এবং সাধারণ স্বাস্থ্য পরীক্ষা করা হয়, যা আপনার স্বাস্থ্য সম্পর্কে ধারণা দেয়।</li>
+                <li><strong>হৃদরোগের ঝুঁকি হ্রাস:</strong> নিয়মিত রক্তদান শরীরে আয়রনের মাত্রা নিয়ন্ত্রণ করে, যা হৃদরোগের ঝুঁকি কমায়।</li>
+                <li><strong>নতুন রক্তকণিকা:</strong> রক্তদানের পর শরীর নতুন রক্তকণিকা তৈরি করে, যা রক্ত সঞ্চালনকে সতেজ রাখে।</li>
+                <li><strong>ক্যালোরি পোড়ানো:</strong> একবার রক্তদানে প্রায় ৬৫০ ক্যালোরি পোড়ে, যা ওজন নিয়ন্ত্রণে সহায়ক।</li>
+                <li><strong>মানসিক সুস্থতা:</strong> কারো জীবন বাঁচানোর অনুভূতি মানসিক তৃপ্তি, আত্মবিশ্বাস বাড়ায় এবং স্ট্রেস কমায়।</li>
+                <li><strong>সামাজিক সুবিধা:</strong> রক্তদান সমাজে সচেতনতা বাড়ায় এবং অন্যদের উৎসাহিত করে। রক্তদাতারা প্রায়ই সম্মাননা বা সার্টিফিকেট পান।</li>
+                <li><strong>জরুরি অগ্রাধিকার:</strong> নিয়মিত রক্তদাতারা জরুরি প্রয়োজনে নিজের বা পরিবারের জন্য অগ্রাধিকার পেতে পারেন।</li>
+                <li><strong>কমিউনিটি সেবা:</strong> রক্তদান দুর্বল ও অসুস্থ ব্যক্তিদের জীবন বাঁচায়, যেমন দুর্ঘটনায় আহত বা থ্যালাসেমিয়া রোগীদের।</li>
+            </ul>
+            <button id="backToProfileBtn" aria-label="Back to Profile">প্রোফাইলে ফিরুন</button>
+        </div>
+    </div>
+
+    <!-- Donor Info Page -->
+    <div id="donorInfoPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Donor Information</h2>
+        <form id="donorForm" aria-label="Donor Information Form">
+            <input type="text" id="donorName" placeholder="Name" required aria-label="Donor's Name">
+            <input type="number" id="donorAge" placeholder="Age" required aria-label="Donor's Age">
+            <select id="donorGender" required aria-label="Donor's Gender">
+                <option value="" disabled selected>Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" id="donorLocation" placeholder="Location" required aria-label="Donor's Location">
+            <input type="tel" id="donorMobile" placeholder="Mobile Number" required aria-label="Donor's Mobile Number">
+            <select id="donorBloodGroup" required aria-label="Donor's Blood Group">
+                <option value="" disabled selected>Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+            <input type="date" id="donorLastDonationDate" required aria-label="Last Donation Date">
+            <button type="submit" aria-label="Save Donor Information">Save</button>
+        </form>
+    </div>
+
+    <!-- Donor List Page -->
+    <div id="donorListPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Donor List</h2>
+        <div id="donorTableBody"></div>
+        <button id="prevPageBtn" aria-label="Previous Page">Previous</button>
+        <span id="currentPage">Page: 1</span>
+        <button id="nextPageBtn" aria-label="Next Page">Next</button>
+    </div>
+
+    <!-- Search Donor Page -->
+    <div id="searchDonorPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Search Donors</h2>
+        <input type="text" id="searchName" placeholder="Name" aria-label="Search by Donor's Name">
+        <select id="searchBloodGroup" aria-label="Search by Blood Group">
+            <option value="">All Blood Groups</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+        </select>
+        <button id="searchBtn" aria-label="Search Donors">Search</button>
+    </div>
+
+    <!-- Search Results Page -->
+    <div id="searchResultsPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Search Results</h2>
+        <div id="searchResultsBody"></div>
+        <button id="searchPrevPageBtn" aria-label="Previous Page">Previous</button>
+        <span id="searchCurrentPage">1 of 1</span>
+        <button id="searchNextPageBtn" aria-label="Next Page">Next</button>
+    </div>
+
+    <!-- About Us Page -->
+    <div id="aboutUsPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Narsingdi District Blood Donor Club</h2>
+        <p>
+            <strong>App Developer</strong><br>
+            Name: MD. Raduan Islam Riyaz<br>
+            Profession: Electrical Engineer<br>
+            Mobile: 01645631256<br>
+            Facebook id: <a href="https://www.facebook.com/share/18dzzgGTzo/">Visit Profile</a>
+        </p>
+        <h3>Organization Goals:</h3>
+        <ol>
+            <li>Create awareness about voluntary blood donation</li>
+            <li>Provide accurate information about benefits and needs of blood donation</li>
+            <li>Organize free blood grouping camps in schools, colleges, and local areas</li>
+            <li>Create volunteer teams in each district</li>
+            <li>Celebrate national and international blood-related days</li>
+            <li>Establish own lab to collect and distribute safe blood</li>
+            <li>Provide low-cost blood tests in own lab</li>
+            <li>Support underprivileged and disaster-affected people</li>
+            <li>Establish shelters and educational support for poor children</li>
+            <li>Conduct various humanitarian activities for the country</li>
+        </ol>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Narsingdi Zila Blood Donor Club Logo" class="page-logo">
+        <h2>Admin Panel</h2>
+        <button id="managePendingUsersBtn" aria-label="View Pending Users">Pending Users</button>
+        <button id="manageApprovedUsersBtn" aria-label="View Approved Users">Approved Users</button>
+        <button id="dashboardBtn" aria-label="View Dashboard">Dashboard</button>
+        <button id="donorDownloadBtn" aria-label="Download Donor List">Donor Download</button>
+        <button id="viewNotificationsBtn" aria-label="View Notifications">Notifications</button>
+        <button id="logoutAdminBtn" aria-label="Log Out">Log Out</button>
+    </div>
+
+    <!-- Pending Users Page -->
+    <div id="pendingUsersPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Pending Users</h2>
+        <div id="pendingUsersTableBody"></div>
+        <button id="pendingPrevPageBtn" aria-label="Previous Page">Previous</button>
+        <span id="pendingCurrentPage">Page: 1</span>
+        <button id="pendingNextPageBtn" aria-label="Next Page">Next</button>
+    </div>
+
+    <!-- Approved Users Page -->
+    <div id="approvedUsersPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Approved Users</h2>
+        <div id="approvedUsersTableBody"></div>
+        <button id="approvedPrevPageBtn" aria-label="Previous Page">Previous</button>
+        <span id="approvedCurrentPage">Page: 1</span>
+        <button id="approvedNextPageBtn" aria-label="Next Page">Next</button>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Dashboard</h2>
+        <p>Total Donors: <span id="totalDonors">0</span></p>
+        <p>Total Users: <span id="totalUsers">0</span></p>
+        <p>Full Access: <span id="fullAccessCount">0</span></p>
+        <p>User Access: <span id="userAccessCount">0</span></p>
+    </div>
+
+    <!-- Donor Download Page -->
+    <div id="donorDownloadPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Download Donor List</h2>
+        <button id="downloadDonorBtn" aria-label="Download Donor List">Download</button>
+    </div>
+
+    <!-- Notifications Page -->
+    <div id="notificationsPage" class="page" style="display: none;">
+        <img src="https://raw.githubusercontent.com/raduanriyaz/NZBDC.logo/6bb5749f652e896071eda902d8d9b87d52361e06/FB_IMG_1702819259488.jpg" alt="Watermark" class="watermark">
+        <h2>Notifications</h2>
+        <div id="notificationsList"></div>
+        <button id="notificationsBackBtn" aria-label="Back to Admin Panel">Back</button>
+    </div>
+</body>
+</html>
+<!-- partial -->
+  <script type="module" src="./script.js"></script>
+
+</body>
+</html>
